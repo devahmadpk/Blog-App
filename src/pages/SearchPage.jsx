@@ -2,18 +2,20 @@
 
 import React from 'react'
 import LatestBlogs from '../components/LatestBlogs'
-import LikedBlogCard from '../components/LikedBlogCard'
+import BlogCard from '../components/BlogCard'
 
 const SearchPage = () => {
   return (
     <div className='w-screen h-min-screen p-4 flex flex-col justify-start items-center'>
-        <input placeholder='Search a query to find blogs...'
-        className='px-4 py-2 rounded-md w-full mt-14 bg-gray-300'></input>
+          <div className='w-full mt-14'>
+              <input placeholder='Search a query to find blogs...'
+              className='px-4 py-2 rounded-md w-full bg-gray-100
+              border-2 border-gray-200 placeholder:text-gray-400 outline-black'>
+            </input>
+          </div>
         <div>
-            <LikedBlogCard />
-            <LikedBlogCard />
-            <LikedBlogCard />
-            <LikedBlogCard />
+        
+            <BlogCard />
         </div>
     </div>
   )

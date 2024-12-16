@@ -11,6 +11,7 @@ import ProfilePage from './ProfilePage'
 import BlogPostPage from './BlogPostPage'
 import CreateBlogPage from './CreateBlogPage'
 import SearchPage from './SearchPage'
+import SignInPage from './SignInPage'
 
 const HomePage = () => {
   return (
@@ -22,11 +23,7 @@ const HomePage = () => {
         <LikedBlogs />
 
         <BottomNav />
-
-        {/* <ProfilePage /> */}
-        {/* <BlogPostPage /> */}
-        {/* <CreateBlogPage /> */}
-        {/* <SearchPage /> */}
+        
     </div>
   )
 }
