@@ -9,6 +9,7 @@ import SignUpPage from './pages/SignUpPage';
 import BlogPostPage from './pages/BlogPostPage';
 import CreateBlogPage from './pages/CreateBlogPage';
 import ProfilePage from './pages/ProfilePage';
+import SearchPage from './pages/SearchPage';
 
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
         <Route path='/blog' element={<BlogPostPage />}></Route>
         <Route path='/create-blog' element={<CreateBlogPage />}></Route>
         <Route path='/profile' element={<ProfilePage />}></Route>
+        <Route path='/search' element={<SearchPage />}></Route>
+
       </Routes>
     </>
   );
