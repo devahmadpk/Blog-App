@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import profilePic from '../backend/fileuploads/default-user.png'
 
 const HomeTopBar = () => {
   const [profileImage, setProfileImage] = useState('');
@@ -23,7 +22,6 @@ const HomeTopBar = () => {
         }
       
         const response = await axios.get(`http://localhost:5000/user/${userId}`);
-        console.log(response)
         // Set the profile image URL returned by the backend
         const profileImg = response.data.profile_pic;
         // console.log(`ProfileImg: ${profileImg}`)
@@ -41,7 +39,7 @@ const HomeTopBar = () => {
   
   return (
     <>
-    <div className="flex p-4 justify-between px-4 md:px-8 lg:px-14 xl:px-24">
+    <div className="flex p-4 justify-between px-4 md:px-8 lg:px-14 xl:px-24 relative">
       <div className="flex flex-col">
         <span className="text-xl font-bold">Blogs</span>
         <span className="my-1 text-gray-500">Friday, Dec 9</span>
