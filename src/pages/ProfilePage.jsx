@@ -8,6 +8,7 @@ import axios from 'axios';
 const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState('');
   const [userName, setUsername] = useState('');
+  const [userBlogsList, setUserBlogsList] = useState(null);
   const fileInputRef = useRef(null); // Ref for file input
   const cameraIcon = <FontAwesomeIcon icon={faCamera} />;
 
@@ -54,6 +55,7 @@ const ProfilePage = () => {
       });
   
       const updatedImagePath = response.data.filePath;
+      console.log(updatedImagePath)
       setProfileImage(`http://localhost:5000${updatedImagePath}`); // Update the profile image with the new path
       alert('Profile picture updated successfully');
       window.location.reload();
@@ -63,6 +65,12 @@ const ProfilePage = () => {
     }
   };
   
+  const fetchUserBlogs = async () => {
+
+    const userId = localStorage.getItem('userId');
+    const userBlogs = await axios.get(`http://localhost:5000/blogs/${userId}`);
+    setUserBlogsList(userBlogs.data);
+  }
 
   return (
     <div className='w-screen h-min-screen flex flex-col justify-center items-center'>
@@ -81,23 +89,27 @@ const ProfilePage = () => {
             <span className='text-white'>{cameraIcon}</span>
           </div>
         </div>
+
         <p className='capitalize font-bold sm:text-lg'>{userName}</p>
       </div>
 
       <div className='h-full w-full p-4 px-4 md:px-8 lg:px-14 xl:px-24'>
         <div className='flex justify-center *:bg-black *:text-white *:rounded-full *:py-2 *:px-4 *:mx-4 sm:*:mx-8 sm:*:px-8 mt-10'>
-          <button>Your blogs</button>
+          <button onClick={fetchUserBlogs}>Your blogs</button>
           <button>Saved</button>
         </div>
 
         <div className='mt-8'>
-          <BlogCard />
+          {
+            userBlogsList && userBlogsList.map((blog) => {
+              return <BlogCard key={blog.blog_id} title={blog.title} image={blog.image_url} dateCreated={blog.created_at} />;
+          })}
+          
         </div>
       </div>
 
       <BottomNav />
 
-      {/* Hidden file input */}
       <input
         type='file'
         ref={fileInputRef}
