@@ -53,8 +53,8 @@ const blogImgStorage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
-const blogImgUpload = multer({ blogImgStorage });
+const upload = multer({ storage: storage });
+const blogImgUpload = multer({ storage: blogImgStorage });
 
 // Endpoint to handle image upload
 // Update Profile Picture
@@ -91,24 +91,47 @@ app.post('/upload', upload.single('profileImage'), (req, res) => {
   }
 });
 
-// Endpoint to handle blog image upload
-app.post('/upload-blog-image', blogImgUpload.single('blogImage'), (req, res) => {
+// Endpoint to create a blog
+app.post('/create-blog', blogImgUpload.single('blogImage'), (req, res) => {
+  const { userId, title, content } = req.body;
+
+  
+
+  if (!userId || !title || !content) {
+    return res.status(400).json({ message: 'User ID, title, and content are required' });
+  }
+
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'File not uploaded' });
+    let imagePath = null;
+
+    // If an image is uploaded, save its path
+    if (req.file) {
+      imagePath = `/${req.file.filename}`;
     }
 
-    const filePath = `/blogimages/${req.file.filename}`; // Relative file path for blog image
-    console.log('Uploaded blog image:', filePath);
+    // Insert the blog data into the existing blogs table
+    const sql = `
+      INSERT INTO blogs (user_id, title, content, image_url)
+      VALUES (?, ?, ?, ?)
+    `;
 
-    // Optionally, you can save this file path to the database with a reference to the blog post.
+    db.query(sql, [userId, title, content, imagePath], (err, result) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Error saving blog in the database' });
+      }
 
-    res.status(200).json({ message: 'Blog image uploaded successfully', filePath });
+      res.status(201).json({
+        message: 'Blog created successfully',
+        blogId: result.insertId,
+      });
+    });
   } catch (error) {
-    console.error('Error processing blog image upload:', error);
+    console.error('Error processing blog creation:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 // User SignIn
@@ -138,6 +161,23 @@ app.post('/signin', (req, res) => {
         res.status(401).json({message: 'Invalid username or password'});
       }
   
+  });
+});
+
+app.get('/blogs/:userId', (req, res) => {
+  const userId = req.params.userId;
+  const sql = 'SELECT blog_id, title, image_url, content, created_at FROM blogs WHERE user_id = ?';
+
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'An error occurred while fetching user data' });
+    }
+
+    if (result.length > 0) {
+      return res.status(200).json(result); // Return user data including profile_image
+    } else {
+      return res.status(404).json({ message: 'User not found' });
+    }
   });
 });
 
