@@ -94,9 +94,6 @@ app.post('/upload', upload.single('profileImage'), (req, res) => {
 // Endpoint to create a blog
 app.post('/create-blog', blogImgUpload.single('blogImage'), (req, res) => {
   const { userId, title, content } = req.body;
-
-  
-
   if (!userId || !title || !content) {
     return res.status(400).json({ message: 'User ID, title, and content are required' });
   }
@@ -164,6 +161,92 @@ app.post('/signin', (req, res) => {
   });
 });
 
+app.post('/comments', (req, res) => {
+  const {userId, blogId, comment} = req.body;
+  const sql = 'INSERT INTO comments (user_id_c, blog_id_c, comment_text) VALUES (?, ?, ?)';
+  db.query(sql, [userId, blogId, comment], (err, result) => {
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while processing your request'});
+    }
+
+    return res.status(201).json({message: 'Comment posted successfully'});
+  });
+});
+
+
+app.get('/comments/:blogId', (req, res) => {
+  const blogId = req.params.blogId;
+  const sql = `
+  SELECT comments.comment_id, comments.comment_text, comments.created_at AS comment_date, users.username, users.profile_pic,blogs.created_at
+  FROM 
+    comments
+  JOIN 
+    users ON comments.user_id_c = users.user_id
+  JOIN 
+    blogs ON comments.blog_id_c = blogs.blog_id
+  WHERE 
+    comments.blog_id_c = ?;
+`;  db.query(sql, [blogId], (err, result) => {
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while processing your request'});
+    }
+
+    if (result.length > 0) {
+      return res.status(200).json(result); // Return user data including profile_image
+    } else {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // return res.status(200).json(result);
+  });
+});
+
+app.post('/saved-blogs', (req, res) => {
+  const {userId, blogId} = req.body;
+
+  const sql = 'INSERT INTO saved_blogs (user_id_sd, blog_id_sd) VALUES (?, ?)';
+  db.query(sql, [userId, blogId], (err, result) => {
+
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while processing your request'});
+    }
+
+    if(result>0) {
+      return res.status(201).json(result);
+    }
+  });
+});
+
+app.get('/saved-blogs/:id', (req, res) => {
+  const userId = req.params.id;
+  
+  const sql = `SELECT blogs.title, blogs.image_url, saved_blogs.saved_at FROM saved_blogs INNER JOIN blogs ON 
+      saved_blogs.blog_id_sd = blogs.blog_id  WHERE saved_blogs.user_id_sd = ? `;
+  db.query(sql, [userId], (err, result) => {
+
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while processing your request'});
+    }
+
+    return res.status(201).json(result);
+  });
+});
+
+app.post('/liked-blogs', (req, res) => {
+
+  const {userId, blogId} = req.body;
+
+  const sql = 'INSERT INTO likes (user_id_l, blog_id_l) VALUES (?, ?)';
+  db.query(sql, [userId, blogId], (err, result) => {
+
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while processing your request'});
+    }
+
+    return res.status(201).json(result);
+  })
+});
+
 app.get('/blogs/:userId', (req, res) => {
   const userId = req.params.userId;
   const sql = 'SELECT blog_id, title, image_url, content, created_at FROM blogs WHERE user_id = ?';
@@ -177,6 +260,40 @@ app.get('/blogs/:userId', (req, res) => {
       return res.status(200).json(result); // Return user data including profile_image
     } else {
       return res.status(404).json({ message: 'User not found' });
+    }
+  });
+});
+
+app.get('/selected-blogs/:blogId', (req, res) => {
+  const blogId = req.params.blogId;
+  const sql = 'SELECT title, image_url, content, created_at FROM blogs WHERE blog_id = ?';
+
+  db.query(sql, [blogId], (err, result) => {
+    if (err) {  
+      return res.status(500).json({ message: 'An error occurred while fetching blog data' });
+    }
+
+    if (result.length > 0) {
+      return res.status(200).json(result); // Return user data including profile_image
+    } else {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+  });
+});
+
+app.get('/all-blogs', (req, res) => {
+  const blogId = req.params.blogId;
+  const sql = 'SELECT * FROM blogs';
+
+  db.query(sql, [blogId], (err, result) => {
+    if (err) {  
+      return res.status(500).json({ message: 'An error occurred while fetching blog data' });
+    }
+
+    if (result.length > 0) {
+      return res.status(200).json(result); // Return user data including profile_image
+    } else {
+      return res.status(404).json({ message: 'Blog not found' });
     }
   });
 });
@@ -228,6 +345,17 @@ app.get('/user/:id', (req, res) => {
     }
   });
 });
+
+app.get('/interests', (req, res) => {
+  const sql = `SELECT * FROM interests`;
+  db.query(sql, (err, result) => {
+    if(err) {
+      return res.status(500).json({message: 'An error occurred while fetching interests'});
+    }
+
+    return res.status(200).json(result);
+  })
+})
 
 
 // Start the server
