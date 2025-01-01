@@ -21,7 +21,6 @@ const SignInPage = () => {
 
         if (response.status === 200) {
           const { userId, profileImage } = response.data;
-          console.log(response.data)
 
           // Store userId and profileImage in LocalStorage
           localStorage.setItem('userId', userId);
