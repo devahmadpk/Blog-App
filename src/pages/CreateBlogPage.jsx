@@ -54,7 +54,6 @@ const CreateBlogPage = () => {
       axios.post('http://localhost:5000/create-blog', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       }).then((response) => {
-        console.log('Blog created:', response.data);
         alert('Blog created successfully');
         navigate('/home');
       });
@@ -89,7 +88,7 @@ const CreateBlogPage = () => {
         <input
           placeholder='Enter a title for your blog'
           required
-          className='w-full rounded-md mt-12 border-2 border-gray-200 px-4 p-2 sm:px-8 sm:py-4'
+          className='w-full rounded-md mt-6 border-2 border-gray-200 px-4 p-2 sm:px-8 sm:py-4'
           onChange={(e) => setTitle(e.target.value)}
         />
 
@@ -118,14 +117,13 @@ const CreateBlogPage = () => {
           
         </div>
 
-        <div className='flex justify-start'>
-          <InterestBox />
+        <div className='flex justify-start h-auto'>
           <InterestBox />
         </div>
 
         <textarea
           placeholder='Enter your blog content...'
-          className='w-full flex-grow p-4 mt-4 rounded-md mb-20 border-2 border-black'
+          className='w-full flex-grow p-4  rounded-md mb-20 border-2 border-black'
           required
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
