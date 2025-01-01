@@ -3,11 +3,16 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faComment} from '@fortawesome/free-regular-svg-icons'
-import testImg from '../test-img.jpg'
 import UserInterest from './UserInterest'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import { Navigate, useNavigate } from 'react-router-dom'
 
-const BlogCard = ({ title, image, content, dateCreated }) => {
+const BlogCard = ({ id, title, image, dateCreated }) => {
+
+  const navigate = useNavigate();
+  const handleBlogClick = () => {
+    navigate(`/blog/${id}`);
+  }
 
     const heartIcon = <FontAwesomeIcon icon={faHeart} />
     const commentIcon = <FontAwesomeIcon icon={faComment} />
@@ -22,7 +27,7 @@ const BlogCard = ({ title, image, content, dateCreated }) => {
       };
 
   return (
-    <div className='flex flex-col p-4 my-4 mx-2 rounded-md bg-gray-100 border-2 border-gray-200'>
+    <div className='flex flex-col p-4 my-4 mx-2 rounded-md bg-gray-100 border-2 border-gray-200' onClick={handleBlogClick}>
         <div className='flex vsm:justify-between vsm:items-center flex-col-reverse vsm:flex-row'>
 
             <div className='vsm:mr-8 py-4 vsm:p-0 md:mr-12'>
@@ -40,7 +45,7 @@ const BlogCard = ({ title, image, content, dateCreated }) => {
         </div>
 
         <div className='flex justify-between py-2 w-full *:text-gray-400 md:mt-4'>
-                <span>{formatDate(dateCreated)}</span>
+                <span className=' w-2/5'>{formatDate(dateCreated)}</span>
                 <div className='*:mx-1'>
                     <button>{heartIcon}</button>
                     <span >10</span>
