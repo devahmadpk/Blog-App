@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const HomeTopBar = () => {
   const [profileImage, setProfileImage] = useState('');
+  const [currentDateDay, setCurrentDateDay] = useState('');
   const navigate = useNavigate();
 
   // Function to navigate to the user's profile page
@@ -34,7 +35,18 @@ const HomeTopBar = () => {
       }
     };
 
+    const dateFetcher = () => {
+      const d = new Date();
+      const day = d.getDay();
+      const date = d.getDate();
+      const month = d.getMonth();
+      const dayInWords = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const monthInWords = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+      setCurrentDateDay(`${dayInWords[day]}, ${date} ${monthInWords[month]}`);
+    }
+
     fetchUserData();
+    dateFetcher();
   }, [navigate]); // Dependency array to rerun the effect if navigate changes
   
   return (
@@ -42,7 +54,7 @@ const HomeTopBar = () => {
     <div className="flex p-4 justify-between px-4 md:px-8 lg:px-14 xl:px-24 relative">
       <div className="flex flex-col">
         <span className="text-xl font-bold">Blogs</span>
-        <span className="my-1 text-gray-500">Friday, Dec 9</span>
+        <span className="my-1 text-gray-500">{currentDateDay}</span>
       </div>
       <div className="rounded-full h-14 w-14 sm:h-20 sm:w-20 bg-white">
         <img
