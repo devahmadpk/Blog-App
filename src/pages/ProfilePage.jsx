@@ -4,13 +4,16 @@ import BottomNav from '../components/BottomNav';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { set } from 'date-fns';
 
 const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState('');
   const [userName, setUsername] = useState('');
   const [userBlogsList, setUserBlogsList] = useState(null);
   const fileInputRef = useRef(null); // Ref for file input
-  const cameraIcon = <FontAwesomeIcon icon={faCamera} />;
+  const cameraIcon = <FontAwesomeIcon icon={faCamera} />
+  const [fetchingBlogs, setFetchingBlogs] = useState('');
+  const [savedBlogs, setSavedBlogs] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,6 +35,8 @@ const ProfilePage = () => {
         setProfileImage('path_to_default_image'); // Handle error by using a default image
       }
     };
+
+
 
     fetchUserData();
   }, []);
@@ -68,8 +73,27 @@ const ProfilePage = () => {
   const fetchUserBlogs = async () => {
 
     const userId = localStorage.getItem('userId');
-    const userBlogs = await axios.get(`http://localhost:5000/blogs/${userId}`);
-    setUserBlogsList(userBlogs.data);
+    try {
+      const userBlogs = await axios.get(`http://localhost:5000/blogs/${userId}`);
+      setUserBlogsList(userBlogs.data);
+    }
+    catch(err) {
+      console.error('Failed to fetch user blogs:', err);
+    }
+    
+    setFetchingBlogs('fetching');
+  }
+
+  const fetchSavedBlogs = async () => {
+    const userId = localStorage.getItem('userId');
+    try {
+      const savedBlogs = await axios.get(`http://localhost:5000/saved-blogs/${userId}`);
+      setSavedBlogs(savedBlogs.data);
+      setFetchingBlogs('saved');
+    }
+    catch (err) {
+      console.error('Failed to fetch saved blogs:', err);
+    }
   }
 
   return (
@@ -96,15 +120,35 @@ const ProfilePage = () => {
       <div className='h-full w-full p-4 px-4 md:px-8 lg:px-14 xl:px-24'>
         <div className='flex justify-center *:bg-black *:text-white *:rounded-full *:py-2 *:px-4 *:mx-4 sm:*:mx-8 sm:*:px-8 mt-10'>
           <button onClick={fetchUserBlogs}>Your blogs</button>
-          <button>Saved</button>
+          <button onClick={fetchSavedBlogs}>Saved</button>
         </div>
 
         <div className='mt-8'>
-          {
-            userBlogsList && userBlogsList.map((blog) => {
-              return <BlogCard key={blog.blog_id} title={blog.title} image={blog.image_url} dateCreated={blog.created_at} />;
-          })}
-          
+        {
+          fetchingBlogs === 'fetching' && userBlogsList ? (
+            userBlogsList.map((blog) => (
+              <BlogCard
+                key={blog.blog_id}
+                id={blog.blog_id}
+                title={blog.title}
+                image={blog.image_url}
+                dateCreated={blog.created_at}
+              />
+            ))
+          ) : fetchingBlogs === 'saved' && savedBlogs ? (
+            savedBlogs.map((blog) => (
+              <BlogCard
+                key={blog.saved_blog_id}
+                id={blog.saved_blog_id}
+                title={blog.title}
+                image={blog.image_url}
+                dateCreated={blog.saved_at}
+              />
+            ))
+          ) : (
+            <div>No blogs to show</div>
+          )
+        }
         </div>
       </div>
 
