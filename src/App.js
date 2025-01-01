@@ -24,6 +24,7 @@ function App() {
         <Route path='/create-blog' element={<CreateBlogPage />}></Route>
         <Route path='/profile' element={<ProfilePage />}></Route>
         <Route path='/search' element={<SearchPage />}></Route>
+        <Route path='/blog/:id' element={<BlogPostPage />}></Route>
 
       </Routes>
     </>
